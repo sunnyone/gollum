@@ -73,6 +73,22 @@ opts = OptionParser.new do |opts|
     wiki_options[:mathjax] = true
   end
 
+  opts.on("--blockdiag-path [PATH]", "Specify the 'blockdiag' path") do |path|
+    wiki_options[:blockdiag_path] = path
+  end
+
+  opts.on("--seqdiag-path [PATH]", "Specify the 'seqdiag' path") do |path|
+    wiki_options[:seqdiag_path] = path
+  end
+
+  opts.on("--actdiag-path [PATH]", "Specify the 'actdiag' path") do |path|
+    wiki_options[:actdiag_path] = path
+  end
+
+  opts.on("--nwdiag-path [PATH]", "Specify the 'nwdiag' path") do |path|
+    wiki_options[:nwdiag_path] = path
+  end
+  
   opts.on("--user-icons [SOURCE]", "Set the history user icons. Valid values: gravatar, identicon, none. Default: none.") do |source|
     wiki_options[:user_icons] = source
   end

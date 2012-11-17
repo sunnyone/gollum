@@ -286,6 +286,11 @@ module Precious
       halt 404
     end
 
+    get %r{tmp/([0-9a-f]{40})\.png} do
+      path = ::File.expand_path ::File.join wiki_new.path, "tmp/#{params[:captures][0]}.png"
+      send_file path, :type => 'image/png'
+    end
+    
     get %r{/(.+?)/([0-9a-f]{40})} do
       file_path = params[:captures][0]
       version   = params[:captures][1]

@@ -199,6 +199,10 @@ module Gollum
       @live_preview         = options.fetch :live_preview, true
       @universal_toc        = options.fetch :universal_toc, false
       @mathjax              = options.fetch :mathjax, false
+      @blockdiag_path       = options.fetch :blockdiag_path, nil
+      @seqdiag_path         = options.fetch :seqdiag_path, nil
+      @actdiag_path         = options.fetch :actdiag_path, nil
+      @nwdiag_path          = options.fetch :nwdiag_path, nil
       @show_all             = options.fetch :show_all, false
       @collapse_tree        = options.fetch :collapse_tree, false
       @css                  = options.fetch :css, false
@@ -615,6 +619,18 @@ module Gollum
     # Toggles mathjax.
     attr_reader :mathjax
 
+    # Gets the blockdiag location. Default: nil
+    attr_reader :blockdiag_path
+    
+    # Gets the seqdiag location. Default: nil
+    attr_reader :seqdiag_path
+    
+    # Gets the actdiag location. Default: nil
+    attr_reader :actdiag_path
+    
+    # Gets the nwdiag location. Default: nil
+    attr_reader :nwdiag_path
+    
     # Toggles user icons. Default: 'none'
     attr_reader :user_icons
 

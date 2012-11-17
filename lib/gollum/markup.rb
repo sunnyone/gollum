@@ -55,6 +55,10 @@ module Gollum
         @wiki.sanitizer
 
       data = @data.dup
+      data = process_blockdiag(data) if @wiki.blockdiag_path
+      data = process_seqdiag(data) if @wiki.seqdiag_path
+      data = process_actdiag(data) if @wiki.actdiag_path
+      data = process_nwdiag(data) if @wiki.nwdiag_path
       data = extract_metadata(data)
       data = extract_gitcode(data)
       data = extract_code(data)
@@ -128,6 +132,81 @@ module Gollum
       end
       toc = toc.to_xml(@to_xml) if toc != nil
       [doc, toc]
+    end
+
+    #########################################################################
+    #
+    # Blockdiag / Seqdiag / Actdiag / Nwdiag
+    #
+    #########################################################################
+    
+    def process_diag_body(tool_name, tool_path, body)
+      id = Digest::SHA1.hexdigest(body)
+      
+      tmp = Tempfile.new('diag')
+      begin
+        tmp.write(body)
+        tmp.close
+        
+        img_dir = ::File.expand_path(::File.join(@wiki.path, 'tmp'))
+        ::Dir.mkdir(img_dir) unless ::File.exists?(img_dir)
+        out_path = ::File.join(img_dir, "#{id}.png")
+        
+        system(tool_path, "-Tpng", "-o", out_path, tmp.path)
+        
+        if !::File.exists?(out_path) || ::File.size(out_path) == 0 then
+          return "#{tool_name} error: failed to generate an image."
+        end
+      ensure
+        tmp.unlink
+      end
+      
+      img_url = ::File.join(@wiki.base_path, "tmp", "#{id}.png")
+      return %Q(<img alt="#{tool_name} image" src="#{img_url}">)
+    end
+    
+    # Replace blockdiag tags to img tags.
+    #
+    # data - The raw String data.
+    #
+    # Returns the String data contains img tags.
+    def process_blockdiag(data)
+      data.gsub(/\<blockdiag\>\s*(.*?)\s*\<\/blockdiag\>/m) do
+        process_diag_body("blockdiag", @wiki.blockdiag_path, $1)
+      end
+    end
+    
+    # Replace seqdiag tags to img tags.
+    #
+    # data - The raw String data.
+    #
+    # Returns the String data contains img tags.
+    def process_seqdiag(data)
+      data.gsub(/\<seqdiag\>\s*(.*?)\s*\<\/seqdiag\>/m) do
+        process_diag_body("seqdiag", @wiki.seqdiag_path, $1)
+      end
+    end
+
+    # Replace actdiag tags to img tags.
+    #
+    # data - The raw String data.
+    #
+    # Returns the String data contains img tags.
+    def process_actdiag(data)
+      data.gsub(/\<actdiag\>\s*(.*?)\s*\<\/actdiag\>/m) do
+        process_diag_body("actdiag", @wiki.actdiag_path, $1)
+      end
+    end
+
+    # Replace nwdiag tags to img tags.
+    #
+    # data - The raw String data.
+    #
+    # Returns the String data contains img tags.
+    def process_nwdiag(data)
+      data.gsub(/\<nwdiag\>\s*(.*?)\s*\<\/nwdiag\>/m) do
+        process_diag_body("nwdiag", @wiki.nwdiag_path, $1)
+      end
     end
 
     #########################################################################
