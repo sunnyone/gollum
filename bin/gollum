@@ -103,6 +103,10 @@ opts = OptionParser.new do |opts|
   opts.on("--h1-title", "Sets page title to value of first h1") do
     wiki_options[:h1_title] = true
   end
+
+  opts.on("--repo-is-bare", "Use bare repositry") do
+    wiki_options[:repo_is_bare] = true
+  end
 end
 
 # Read command line options into `options` hash
