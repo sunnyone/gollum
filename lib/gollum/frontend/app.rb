@@ -19,7 +19,8 @@ class String
   def to_url
     return nil if self.nil?
     return self if ['_Header', '_Footer', '_Sidebar'].include? self
-    upstream_to_url
+    ##upstream_to_url
+    self
   end
 end
 
@@ -200,7 +201,7 @@ module Precious
 
       begin
         wiki.write_page(name, format, params[:content], commit_message, path)
-        redirect to("/#{clean_url(::File.join(path,name))}")
+        redirect to("/#{clean_url(encodeURIComponent(::File.join(path,name)))}")
       rescue Gollum::DuplicatePageError => e
         @message = "Duplicate page: #{e.message}"
         mustache :error
