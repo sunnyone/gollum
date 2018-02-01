@@ -21,11 +21,11 @@ Gollum::set_git_max_filesize(190 * 10**6)
 class String
   alias :upstream_to_url :to_url
 
-  if defined?(Gollum::GIT_ADAPTER) && Gollum::GIT_ADAPTER != 'grit'
+  #if defined?(Gollum::GIT_ADAPTER) && Gollum::GIT_ADAPTER != 'grit'
     def to_ascii
       self # Do not transliterate utf-8 url's unless using Grit
     end
-  end
+  #end
 
   # _Header => header which causes errors
   def to_url
