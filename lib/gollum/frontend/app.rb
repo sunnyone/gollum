@@ -12,18 +12,6 @@ require 'gollum/frontend/views/has_page'
 
 require File.expand_path '../helpers', __FILE__
 
-# Fix to_url
-class String
-  alias :upstream_to_url :to_url
-  # _Header => header which causes errors
-  def to_url
-    return nil if self.nil?
-    return self if ['_Header', '_Footer', '_Sidebar'].include? self
-    ##upstream_to_url
-    self
-  end
-end
-
 # Run the frontend, based on Sinatra
 #
 # There are a number of wiki options that can be set for the frontend
@@ -149,7 +137,7 @@ module Precious
       wiki      = wiki_new
       page      = wiki.paged(page_name, path, exact = true)
       return if page.nil?
-      rename    = params[:rename].to_url if params[:rename]
+      rename    = params[:rename]
       name      = rename || page.name
       committer = Gollum::Committer.new(wiki, commit_message)
       commit    = {:committer => committer}
@@ -177,7 +165,7 @@ module Precious
 
     get '/create/*' do
       wikip = wiki_page(params[:splat].first.gsub('+', '-'))
-      @name = wikip.name.to_url
+      @name = wikip.name
       @path = wikip.path
 
       page = wikip.page
@@ -189,7 +177,8 @@ module Precious
     end
 
     post '/create' do
-      name         = params[:page].to_url
+      # Keep Unicode titles intact; Page.cname handles filename normalization.
+      name         = params[:page]
       path         = sanitize_empty_params(params[:path]) || ''
       format       = params[:format].intern
 
@@ -201,7 +190,7 @@ module Precious
 
       begin
         wiki.write_page(name, format, params[:content], commit_message, path)
-        redirect to("/#{clean_url(encodeURIComponent(::File.join(path,name)))}")
+        redirect to("/#{clean_url(encodeURIComponent(::File.join(path, Gollum::Page.cname(name))))}")
       rescue Gollum::DuplicatePageError => e
         @message = "Duplicate page: #{e.message}"
         mustache :error
@@ -252,12 +241,13 @@ module Precious
 
     post '/compare/*' do
       @file     = params[:splat].first
+      escaped_file = clean_url(encodeURIComponent(@file))
       @versions = params[:versions] || []
       if @versions.size < 2
-        redirect to("/history/#{@file}")
+        redirect to("/history/#{escaped_file}")
       else
         redirect to("/compare/%s/%s...%s" % [
-          @file,
+          escaped_file,
           @versions.last,
           @versions.first]
         )

@@ -100,6 +100,12 @@ Page file names may contain any printable UTF-8 character except space
 (U+0020) and forward slash (U+002F). If you commit a page file with any of
 these characters in the name it will not be accessible via the web interface.
 
+The web interface preserves Japanese and other Unicode page names when creating
+or renaming pages, without transliterating them to ASCII or lowercasing them.
+For example, `日本語 入門` is stored as `日本語-入門.md` in Markdown format.
+Page URLs are percent-encoded, while links such as `[[日本語について]]` keep
+the original title when opening the page creation form.
+
 Even though page files may be placed in any directory, there is still only a
 single namespace for page names, so all page files should have globally unique
 names regardless of where they are located in the repository.
